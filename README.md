@@ -219,7 +219,7 @@ O `package.json` está configurado para iniciar o projeto com Nodemon:
 Crie no PostgreSQL um banco chamado:
 
 ```text
-_2025_escola2
+escola
 ```
 
 Depois execute o arquivo:
@@ -304,7 +304,7 @@ const { Pool } = pkg;
 const BD = new Pool({
   user: 'postgres',
   host: 'localhost',
-  database: '_2025_escola2',
+  database: 'escola',
   password: 'admin',
   port: 5432
 });
