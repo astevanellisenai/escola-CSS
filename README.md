@@ -94,9 +94,11 @@ O projeto possui uma página inicial pública e uma área administrativa protegi
 ## 📁 Estrutura do projeto
 
 ```text
-escola-Twind/
+escola-CSS/
 │
 ├── public/                         # Arquivos estáticos da aplicação
+│   └── css/
+│       └── style.css               # Estilos da aplicação
 │
 ├── routes/                         # Rotas da aplicação
 │   ├── admin.js
@@ -124,7 +126,6 @@ escola-Twind/
 ├── escola.sql                      # Estrutura e dados iniciais do banco
 ├── usuários.sql                    # Script de criação do usuário inicial
 ├── TRIGGER.sql                     # Triggers do banco de dados
-├── twind.config.js                 # Configuração visual do projeto
 ├── package.json
 ├── package-lock.json
 ├── .gitignore
@@ -155,13 +156,13 @@ npm -v
 ### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/astevanellisenai/escola-Twind.git
+git clone https://github.com/astevanellisenai/escola-CSS.git
 ```
 
 Entre na pasta:
 
 ```bash
-cd escola-Twind
+cd escola-CSS
 ```
 
 ### 2. Instalar as dependências
@@ -396,12 +397,12 @@ Isso permite acompanhar o desempenho do aluno individualmente em cada disciplina
 O projeto possui uma configuração visual própria no arquivo:
 
 ```text
-twind.config.js
+public/css/style.css
 ```
 
-A configuração define uma paleta de cores para a interface, incluindo:
+O CSS define a paleta de cores e os estilos utilizados pela interface, incluindo:
 
-- Azul para elementos principais do sistema
+- Vermelho para elementos principais do sistema
 - Verde para ações de sucesso e edição
 - Vermelho para exclusões e erros
 - Tons neutros para fundos e textos
