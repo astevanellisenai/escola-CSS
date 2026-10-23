@@ -1,0 +1,153 @@
+<%- include('../includes/header.ejs', { titulo: 'Notas dos Alunos' }) %>
+
+<main class="p-4 md:p-6 bg-neutra-50 min-h-screen">
+  <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-7xl mx-auto border border-gray-200">
+
+    <!-- Busca + Ordenação (padrão Turmas) -->
+    <form action="/notas" method="GET" class="flex flex-col md:flex-row gap-3 items-stretch md:items-end mb-6">
+      <div class="flex-1">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+        <input
+          type="text"
+          name="busca"
+          value="<%= busca || '' %>"
+          placeholder="Aluno, disciplina ou turma"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 outline-none focus:(ring-2 ring-sistema-500 border-sistema-500)"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Ordenar por</label>
+        <select
+          name="ordenar"
+          onchange="this.form.submit()"
+          class="rounded-lg border border-gray-300 px-3 py-2 outline-none focus:(ring-2 ring-sistema-500 border-sistema-500)"
+        >
+          <option value="disciplina"  <%= ordenar==='disciplina'  ? 'selected' : '' %>>Disciplina</option>
+          <option value="aluno"       <%= ordenar==='aluno'       ? 'selected' : '' %>>Aluno</option>
+          <option value="turma"       <%= ordenar==='turma'       ? 'selected' : '' %>>Turma</option>
+          <option value="media_desc"  <%= ordenar==='media_desc'  ? 'selected' : '' %>>Média (maior→menor)</option>
+          <option value="faltas_desc" <%= ordenar==='faltas_desc' ? 'selected' : '' %>>Faltas (maior→menor)</option>
+          <option value="status"      <%= ordenar==='status'      ? 'selected' : '' %>>Status</option>
+        </select>
+      </div>
+
+      <!-- ao submeter manualmente, reinicia na página 1 -->
+      <input type="hidden" name="pg" value="1"/>
+
+      <div>
+        <label class="block text-sm font-medium text-transparent mb-1 select-none">.</label>
+        <button type="submit" class="rounded-lg px-4 py-2 bg-sistema-600 text-white hover:bg-sistema-700 shadow">
+          Buscar
+        </button>
+      </div>
+    </form>
+
+    <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+      <p class="text-erro-600 mb-4"><%= mensagem %></p>
+    <% } %>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-[800px] w-full border-collapse text-sm">
+        <thead class="bg-sistema-700 text-white">
+          <tr>
+            <th class="p-2 text-left">Aluno</th>
+            <th class="p-2 text-left">Turma</th>
+            <th class="p-2 text-left">Disciplina</th>
+            <th class="p-2 text-left">Média</th>
+            <th class="p-2 text-left">Faltas</th>
+            <th class="p-2 text-left">Status</th>
+            <th class="p-2 text-center">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (Array.isArray(vetorDados) && vetorDados.length) { %>
+            <% for (let n of vetorDados) { %>
+              <tr class="border-b border-neutra-200">
+                <td class="p-2"><%= n.nome_aluno %></td>
+                <td class="p-2"><%= n.nome_turma %></td>
+                <td class="p-2"><%= n.nome_disciplina %></td>
+                <td class="p-2"><%= n.media %></td>
+                <td class="p-2"><%= n.nr_faltas %></td>
+                <td class="p-2">
+                  <span class="px-2 py-1 rounded text-xs
+                    <%= n.status === 'Aprovado' ? 'bg-green-100 text-green-700' :
+                        n.status === 'Recuperação' ? 'bg-amber-100 text-amber-700' :
+                        'bg-red-100 text-red-700' %>"><%= n.status || '—' %></span>
+                </td>
+                <td class="p-2 text-center">
+                  <div class="inline-flex gap-4 items-center justify-center">
+                    <!-- Editar (corrigido para /:id_disciplina/:id_aluno/editar) -->
+                    <a href="/notas/<%= n.id_disciplina %>/<%= n.id_aluno %>/editar"
+                       aria-label="Editar nota"
+                       class="w-12 h-12 rounded-full bg-sucesso-600 text-white shadow
+                              flex items-center justify-center
+                              hover:bg-sucesso-700 hover:scale-110
+                              focus:(outline-none ring-2 ring-sucesso-300) transition-all duration-300">
+                      <img src="/img/edit.svg" alt="Editar" class="w-6 h-6">
+                    </a>
+
+                    <!-- Excluir (já estava correto: /:id_disciplina/:id_aluno/deletar) -->
+                    <form action="/notas/<%= n.id_disciplina %>/<%= n.id_aluno %>/deletar" method="POST"
+                          onsubmit="return confirm('Excluir este lançamento de nota?')">
+                      <button type="submit"
+                              aria-label="Excluir nota"
+                              class="w-12 h-12 rounded-full bg-erro-600 text-white shadow
+                                     flex items-center justify-center
+                                     hover:bg-erro-700 hover:scale-110
+                                     focus:(outline-none ring-2 ring-erro-300) transition-all duration-300">
+                        <img src="/img/delete.svg" alt="Excluir" class="w-6 h-6">
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="p-3 text-neutra-600 italic">Nenhuma nota encontrada.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginação (padrão Turmas) -->
+    <%
+      const _b = encodeURIComponent(busca || '');
+      const _o = encodeURIComponent(ordenar || 'disciplina');
+      const mkLink = (p) => `/notas?busca=${_b}&ordenar=${_o}&pg=${p}`;
+    %>
+    <div class="flex items-center justify-center gap-3 mt-6">
+      <% if (pgAtual > 1) { %>
+        <a href="<%= mkLink(1) %>" class="px-3 py-1 rounded border border-neutra-300 hover:bg-gray-50">&laquo; Primeiro</a>
+        <a href="<%= mkLink(pgAtual-1) %>" class="px-3 py-1 rounded border border-neutra-300 hover:bg-gray-50">Anterior</a>
+      <% } %>
+
+      <span class="text-sm text-neutra-700">
+        Página <strong><%= pgAtual %></strong> de <strong><%= totalPgs %></strong>
+      </span>
+
+      <% if (pgAtual < totalPgs) { %>
+        <a href="<%= mkLink(pgAtual+1) %>" class="px-3 py-1 rounded border border-neutra-300 hover:bg-gray-50">Próxima</a>
+        <a href="<%= mkLink(totalPgs) %>" class="px-3 py-1 rounded border border-neutra-300 hover:bg-gray-50">Última &raquo;</a>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- FAB (Adicionar Nova Nota) -->
+  <a href="/notas/nova"
+     aria-label="Adicionar Nota"
+     title="Lançar nova nota"
+     class="fixed right-6 bottom-24 md:bottom-8 z-50
+            w-14 h-14 rounded-full bg-gradient-to-b from-sistema-500 to-sistema-700 text-white
+            flex items-center justify-center shadow-lg
+            hover:shadow-xl hover:scale-110 transition-all duration-300
+            focus:outline-none focus:ring-4 focus:ring-white/50">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M11 5a1 1 0 1 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5z"/>
+    </svg>
+  </a>
+</main>
+
+<%- include('../includes/footer.ejs') %>

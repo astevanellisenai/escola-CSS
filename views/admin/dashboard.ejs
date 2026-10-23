@@ -1,0 +1,147 @@
+<%- include('../includes/header.ejs', { titulo : 'Dashboard' }) %>
+
+<main class="p-4 md:p-6 bg-neutra-50 min-h-screen">
+  <!-- Título da página -->
+  <div class="max-w-7xl mx-auto">
+    <div class="bg-gradient-to-r from-sistema-800 via-sistema-700 to-sistema-500 text-white rounded-xl shadow-md p-4 md:p-6 mb-6">
+      <h1 class="text-xl md:text-2xl font-bold tracking-wide">Dashboard - Gerenciamento Escolar</h1>
+    </div>
+
+    <!-- Cards principais -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+      <!-- Total de Alunos -->
+      <div class="bg-white border border-neutra-200 rounded-xl shadow-md p-4 md:p-6">
+        <h5 class="text-sm font-medium text-neutra-700">Total de Alunos</h5>
+        <p class="text-3xl md:text-4xl font-bold text-sistema-700 mt-2">
+          <%= typeof totalAlunos !== 'undefined' ? totalAlunos : 0 %>
+        </p>
+      </div>
+
+      <!-- Total de Disciplinas -->
+      <div class="bg-white border border-neutra-200 rounded-xl shadow-md p-4 md:p-6">
+        <h5 class="text-sm font-medium text-neutra-700">Total de Disciplinas</h5>
+        <p class="text-3xl md:text-4xl font-bold text-sistema-700 mt-2">
+          <%= typeof totalDisciplinas !== 'undefined' ? totalDisciplinas : 0 %>
+        </p>
+      </div>
+
+      <!-- Taxa de Aprovação (dinâmica) -->
+      <div class="bg-white border border-neutra-200 rounded-xl shadow-md p-4 md:p-6">
+        <h5 class="text-sm font-medium text-neutra-700">Taxa de Aprovação</h5>
+        <p class="text-3xl md:text-4xl font-bold text-sistema-700 mt-2">
+          <%= typeof taxaAprovacao !== 'undefined' ? taxaAprovacao : 0 %>%
+        </p>
+      </div>
+    </section>
+
+    <!-- Seção de gráficos (2 colunas) -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+      <!-- Coluna 1: Barras -->
+      <div class="space-y-4">
+        <div class="bg-white border border-neutra-200 rounded-xl shadow-md">
+          <div class="px-4 py-3 border-b border-neutra-200 bg-sistema-500/10">
+            <h3 class="text-sm font-semibold text-sistema-700">Média por Disciplinas</h3>
+          </div>
+          <div class="p-4">
+            <canvas id="barrasMediaDisciplina"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white border border-neutra-200 rounded-xl shadow-md">
+          <div class="px-4 py-3 border-b border-neutra-200 bg-sistema-500/10">
+            <h3 class="text-sm font-semibold text-sistema-700">Média por Disciplinas por turma</h3>
+          </div>
+          <div class="p-4">
+            <canvas id="barrasMediaDisciplinaTurma"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna 2: Pizza -->
+      <div>
+        <div class="bg-white border border-neutra-200 rounded-xl shadow-md">
+          <div class="px-4 py-3 border-b border-neutra-200 bg-sistema-500/10">
+            <h3 class="text-sm font-semibold text-sistema-700">Aprovação dos Alunos</h3>
+          </div>
+          <div class="p-4">
+            <canvas id="pizzaAprovacaoAlunos"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  // === Gráfico: Média por Disciplinas ===
+  const dadosMediaDisciplinas = <%- JSON.stringify(mediaDisciplinas || []) %>;
+  const nomesDisciplinas = dadosMediaDisciplinas.map(x => x.nome_disciplina);
+  const mediasDisciplinas = dadosMediaDisciplinas.map(x => Number(x.media) || 0);
+
+  new Chart(document.getElementById('barrasMediaDisciplina'), {
+    type: 'bar',
+    data: {
+      labels: nomesDisciplinas,
+      datasets: [{
+        label: 'Média de Notas',
+        data: mediasDisciplinas,
+        backgroundColor: ['#7f1d1d', '#b91c1c', '#dc2626', '#ef4444', '#f87171']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { enabled: true } },
+      scales: {
+        x: { title: { display: true, text: 'Disciplinas' } },
+        y: { title: { display: true, text: 'Média' }, suggestedMin: 0, suggestedMax: 10 }
+      }
+    }
+  });
+
+  // === Gráfico: Pizza Aprovação ===
+  const dadosAprovacaoAlunos = <%- JSON.stringify(statusAluno || []) %>;
+  const labelsStatus = dadosAprovacaoAlunos.map(x => x.status);
+  const valoresStatus = dadosAprovacaoAlunos.map(x => Number(x.total) || 0);
+
+  new Chart(document.getElementById('pizzaAprovacaoAlunos'), {
+    type: 'pie',
+    data: {
+      labels: labelsStatus,
+      datasets: [{
+        data: valoresStatus,
+        backgroundColor: ['#16a34a', '#dc2626', '#f59e0b'] // verde, vermelho, amarelo
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: true } } }
+  });
+
+  // === Gráfico: Média por Disciplina x Turma ===
+  const dadosMediaDisciplinasTurma = <%- JSON.stringify(mediasDisciplinasTurmas || []) %>;
+  const turmas = [...new Set(dadosMediaDisciplinasTurma.map(i => i.nome_turma))];
+  const disciplinas = [...new Set(dadosMediaDisciplinasTurma.map(i => i.nome_disciplina))];
+
+  const cores = ['#7f1d1d','#b91c1c','#dc2626','#ef4444','#f87171','#fca5a5'];
+  const datasets = turmas.map((turma, idx) => ({
+    label: turma,
+    data: disciplinas.map(d => {
+      const item = dadosMediaDisciplinasTurma.find(x => x.nome_turma === turma && x.nome_disciplina === d);
+      return Number(item?.media) || 0;
+    }),
+    backgroundColor: cores[idx % cores.length]
+  }));
+
+  new Chart(document.getElementById('barrasMediaDisciplinaTurma'), {
+    type: 'bar',
+    data: { labels: disciplinas, datasets },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true } },
+      scales: {
+        x: { title: { display: true, text: 'Disciplinas' } },
+        y: { title: { display: true, text: 'Média' }, suggestedMin: 0, suggestedMax: 10 }
+      }
+    }
+  });
+</script>
+
+<%- include('../includes/footer.ejs') %>

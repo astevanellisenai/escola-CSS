@@ -1,0 +1,85 @@
+<%- include('../includes/header.ejs', { titulo: (typeof titulo !== 'undefined' ? titulo : (modo === 'editar' ? 'Editar Nota' : 'Nova Nota')) }) %>
+
+<main class="p-4 md:p-6 bg-neutra-50 min-h-screen flex flex-col items-center justify-center">
+  <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md border border-gray-200">
+    <h2 class="text-2xl font-semibold text-sistema-700 mb-6 text-center">
+      <%= (typeof titulo !== 'undefined' ? titulo : (modo === 'editar' ? 'Editar Nota' : 'Lançar Nova Nota')) %>
+    </h2>
+
+    <% if (typeof mensagem !== 'undefined' && mensagem) { %>
+      <p class="text-erro-600 mb-4 text-center"><%= mensagem %></p>
+    <% } %>
+
+    <%
+      // action conforme modo (novo/editar)
+      const _action = (modo === 'editar' && nota?.id_disciplina && nota?.id_aluno)
+        ? `/notas/${nota.id_disciplina}/${nota.id_aluno}/editar`
+        : '/notas/nova';
+    %>
+
+    <form action="<%= _action %>" method="POST" class="space-y-4">
+      <!-- Aluno (fora da aba, precisamos escolher o aluno aqui) -->
+      <div>
+        <label for="id_aluno" class="block mb-1 font-medium text-gray-700">Aluno</label>
+        <select id="id_aluno" name="id_aluno" required
+                class="w-full border border-neutra-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sistema-500">
+          <option value="">Selecione um aluno</option>
+          <% for (let a of (alunos || [])) { %>
+            <option value="<%= a.id_aluno %>"
+              <%= String(a.id_aluno) === String(nota?.id_aluno ?? '') ? 'selected' : '' %>>
+              <%= a.nome %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+      <!-- Disciplina (mesmo padrão da aba lançar) -->
+      <div>
+        <label for="id_disciplina" class="block mb-1 font-medium text-gray-700">Disciplina</label>
+        <select id="id_disciplina" name="id_disciplina" required
+                class="w-full border border-neutra-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sistema-500">
+          <option value="">Selecione uma disciplina</option>
+          <% for (let d of (disciplinas || [])) { %>
+            <option value="<%= d.id_disciplina %>"
+              <%= String(d.id_disciplina) === String(nota?.id_disciplina ?? '') ? 'selected' : '' %>>
+              <%= d.nome_disciplina %>
+            </option>
+          <% } %>
+        </select>
+      </div>
+
+      <!-- Média (igual à aba: step 0.01) -->
+      <div>
+        <label for="media" class="block mb-1 font-medium text-gray-700">Média</label>
+        <input type="number" id="media" name="media" step="0.01" min="0" max="100" required
+               value="<%= (nota?.media ?? '') %>"
+               placeholder="Ex.: 7.50"
+               class="w-full border border-neutra-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sistema-500"/>
+        <p class="text-xs text-neutra-500 mt-1">Use ponto ou vírgula — ex.: 7.5 ou 7,5</p>
+      </div>
+
+      <!-- Faltas (exibe 'Faltas', envia 'nr_faltas' para casar com o back) -->
+      <div>
+        <label for="nr_faltas" class="block mb-1 font-medium text-gray-700">Faltas</label>
+        <input type="number" id="nr_faltas" name="nr_faltas" min="0" step="1" required
+               value="<%= (typeof nota?.nr_faltas !== 'undefined' && nota.nr_faltas !== null) ? nota.nr_faltas : '' %>"
+               placeholder="Ex.: 3"
+               class="w-full border border-neutra-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sistema-500"/>
+      </div>
+
+      
+      <!-- Ações (padrão da aba: Gravar / Cancelar) -->
+      <div class="flex gap-2 justify-end pt-2">
+        <a href="/notas" class="bg-neutra-300 hover:bg-neutra-400 text-neutra-900 px-4 py-2 rounded transition">
+          Cancelar
+        </a>
+        <button type="submit"
+                class="bg-sistema-700 hover:bg-sistema-600 text-white px-4 py-2 rounded transition">
+          <%= modo === 'editar' ? 'Salvar alterações' : 'Gravar' %>
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<%- include('../includes/footer.ejs') %>

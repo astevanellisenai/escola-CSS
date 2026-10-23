@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Curso de Desenvolvimento de Software - SENAI / SESI</title>
+
+  <!-- Twind (ESM) -->
+  <script type="module" src="/js/twind-setup.js"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-sans">
+  <!-- Cabeçalho -->
+  <header class="bg-gradient-to-r from-[#004B8D] to-[#0072CE] text-white shadow-md">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
+      <div class="flex items-center gap-3 min-w-0">
+        <!-- use PNG/SVG com fundo transparente em /public/img/logo.png -->
+        <img src="/img/logo.png" alt="Logo SENAI" class="h-8 sm:h-10 md:h-12 shrink-0" />
+        <h1 class="text-lg sm:text-xl md:text-2xl font-bold tracking-wide truncate">
+          Curso Técnico
+        </h1>
+      </div>
+
+      <!-- Ação principal: mobile ocupa largura total -->
+      <a href="/admin/"
+         class="w-full sm:w-auto text-center bg-white text-[#004B8D] px-4 py-2 rounded-md font-semibold hover:bg-gray-100">
+        Área Administrativa
+      </a>
+    </div>
+  </header>
+
+  <!-- Seção Hero -->
+  <section class="relative">
+    <!-- imagem de fundo responsiva -->
+    <div class="relative min-h-[48vh] sm:min-h-[56vh] md:min-h-[64vh] bg-center bg-cover"
+         style="background-image:url('/img/lab-senai.png')">
+      <div class="absolute inset-0 bg-black/60"></div>
+
+      <div class="relative z-10 max-w-4xl mx-auto text-center text-white px-4 sm:px-6 py-14 sm:py-20 md:py-24">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-3 sm:mb-4 leading-tight">
+          Inove, Crie e Transforme com o SENAI
+        </h2>
+        <p class="text-base sm:text-lg md:text-xl leading-relaxed mb-6 sm:mb-8">
+          O curso Técnico em Desenvolvimento de Software do SENAI, em parceria com as escolas SESI,
+          prepara você para os desafios da Indústria 4.0 com programação, banco de dados e integração de sistemas.
+        </p>
+        <a href="/admin/"
+           class="inline-block bg-[#E30613] px-5 sm:px-6 py-3 rounded-md font-semibold hover:bg-red-700 transition">
+          Acesse o Sistema
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção Sobre -->
+  <section class="max-w-6xl mx-auto py-12 sm:py-16 px-4 sm:px-6">
+    <div class="text-center">
+      <h3 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-[#004B8D]">Sobre o Curso</h3>
+      <p class="text-sm sm:text-base md:text-lg leading-relaxed mb-8 md:mb-10">
+        O curso de <strong>Desenvolvimento de Software</strong> oferecido pelo <strong>SENAI</strong> e realizado nas unidades do <strong>SESI</strong>
+        capacita estudantes em <span class="font-semibold text-[#E30613]">programação web, mobile, bancos de dados e integração com APIs</span>.
+      </p>
+    </div>
+
+    <!-- Cards responsivos: 1 → 2 → 3 colunas -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+      <article class="bg-white shadow-md rounded-2xl p-5 sm:p-6">
+        <img src="/img/programacao.png" alt="Programação"
+             class="rounded-xl mb-4 w-full aspect-[4/3] object-cover" />
+        <h4 class="font-semibold text-lg sm:text-xl text-[#004B8D] mb-2">Programação</h4>
+        <p class="text-sm sm:text-base">Desenvolva com JavaScript, Node.js e bancos relacionais.</p>
+      </article>
+
+      <article class="bg-white shadow-md rounded-2xl p-5 sm:p-6">
+        <img src="/img/tecnologia.png" alt="Tecnologia"
+             class="rounded-xl mb-4 w-full aspect-[4/3] object-cover" />
+        <h4 class="font-semibold text-lg sm:text-xl text-[#004B8D] mb-2">Tecnologia</h4>
+        <p class="text-sm sm:text-base">Ferramentas e métodos da Indústria 4.0 aplicados ao desenvolvimento.</p>
+      </article>
+
+      <article class="bg-white shadow-md rounded-2xl p-5 sm:p-6">
+        <img src="/img/unidade.png" alt="Unidade SESI"
+             class="rounded-xl mb-4 w-full aspect-[4/3] object-cover" />
+        <h4 class="font-semibold text-lg sm:text-xl text-[#004B8D] mb-2">Ambiente SESI</h4>
+        <p class="text-sm sm:text-base">Laboratórios modernos e conectados nas unidades escolares do SESI.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Rodapé -->
+  <footer class="bg-[#004B8D] text-white text-center py-6 mt-8 md:mt-16">
+    <p class="text-sm sm:text-base">© 2025 SENAI / SESI - Curso Técnico em Desenvolvimento de Software</p>
+  </footer>
+</body>
+</html>
