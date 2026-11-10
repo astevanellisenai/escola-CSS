@@ -1,5 +1,6 @@
 import express from 'express';
 import session from 'express-session';
+import BD from './db.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -58,6 +59,27 @@ app.use('/alunos', verificarAutenticacao, alunosRotas);
 app.use('/notas', verificarAutenticacao , notasRotas);
 app.use('/usuarios', verificarAutenticacao , usuariosRotas);
 
-app.listen(3002, () =>
-  console.log('Servidor rodando em http://localhost:3002')
-);
+// Testa a conexão com o PostgreSQL antes de iniciar o servidor.
+const porta = 3002;
+
+async function iniciarServidor() {
+  try {
+    const resultado = await BD.query('SELECT current_database() AS nome');
+
+    console.log('✅ PostgreSQL conectado com sucesso!');
+    console.log('📁 Banco de dados: ' + resultado.rows[0].nome);
+
+    app.listen(porta, () => {
+      console.log('✅ Servidor iniciado: http://localhost:' + porta);
+    });
+  } catch (erro) {
+    console.error('❌ Não foi possível conectar ao PostgreSQL.');
+    console.error('Motivo: ' + erro.message);
+    console.error('Verifique se o PostgreSQL está ativo e confira a conexão em db.js.');
+
+    await BD.end();
+    process.exitCode = 1;
+  }
+}
+
+iniciarServidor();
